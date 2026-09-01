@@ -12,7 +12,6 @@ class PaletteReport:
     source_color_count: int
     corrected_pixel_count: int
     transparent_pixel_count: int
-    cropped_transparent_margin: bool
 
 
 @dataclass(frozen=True)

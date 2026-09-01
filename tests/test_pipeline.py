@@ -5,7 +5,7 @@ from PIL import Image
 from src.config.icon import (
     DEFAULT_ARTWORK_SIZE,
     DEFAULT_PADDING,
-    GRAY,
+    BLACK,
     TRANSPARENT,
     WHITE,
 )
@@ -18,7 +18,7 @@ class FormatterPipelineTests(unittest.TestCase):
         source = Image.new("RGB", (200, 100), WHITE)
         for y in range(20, 80):
             for x in range(40, 160):
-                source.putpixel((x, y), GRAY)
+                source.putpixel((x, y), BLACK)
 
         theme = (0, 112, 192)
         icons = format_icon(source, theme)
@@ -44,20 +44,32 @@ class FormatterPipelineTests(unittest.TestCase):
             for pixel in flattened_data(icons.dominant)
             if pixel[3] != 0
         }
-        self.assertLessEqual(standard_colors, {theme, WHITE, GRAY})
+        self.assertLessEqual(standard_colors, {theme, WHITE, BLACK})
         self.assertLessEqual(solid_colors, {theme, WHITE})
         self.assertLessEqual(dominant_colors, {theme, WHITE})
 
     def test_variant_center_pixel_mappings(self):
-        source = Image.new("RGB", (10, 10), GRAY)
+        source = Image.new("RGB", (10, 10), BLACK)
         theme = (10, 80, 160)
         icons = format_icon(source, theme)
 
         output_size = DEFAULT_ARTWORK_SIZE + (2 * DEFAULT_PADDING)
         center = (output_size // 2, output_size // 2)
-        self.assertEqual(icons.standard.getpixel(center)[:3], GRAY)
+        self.assertEqual(icons.standard.getpixel(center)[:3], BLACK)
         self.assertEqual(icons.solid.getpixel(center)[:3], WHITE)
         self.assertEqual(icons.dominant.getpixel(center)[:3], theme)
+
+    def test_black_theme_remains_distinct_from_black_artwork(self):
+        source = Image.new("RGB", (10, 10), BLACK)
+
+        icons = format_icon(source, BLACK)
+
+        output_size = DEFAULT_ARTWORK_SIZE + (2 * DEFAULT_PADDING)
+        center = (output_size // 2, output_size // 2)
+        self.assertEqual(icons.standard.getpixel(center)[:3], BLACK)
+        self.assertEqual(icons.solid.getpixel(center)[:3], WHITE)
+        self.assertEqual(icons.solid.getpixel((output_size // 2, 10))[:3], BLACK)
+        self.assertEqual(icons.dominant.getpixel(center)[:3], BLACK)
 
     def test_solid_white_artwork_has_no_inner_circle_seam(self):
         source = Image.new("RGB", (10, 10), WHITE)
@@ -71,7 +83,7 @@ class FormatterPipelineTests(unittest.TestCase):
         self.assertEqual(visible_colors, {theme})
 
     def test_custom_artwork_and_padding_set_output_size(self):
-        source = Image.new("RGB", (10, 10), GRAY)
+        source = Image.new("RGB", (10, 10), BLACK)
 
         icons = format_icon(
             source,
@@ -86,7 +98,7 @@ class FormatterPipelineTests(unittest.TestCase):
             self.assertEqual(image.size, (750, 750))
 
     def test_padding_may_be_smaller_than_combined_ring_widths(self):
-        source = Image.new("RGB", (10, 10), GRAY)
+        source = Image.new("RGB", (10, 10), BLACK)
 
         icons = format_icon(
             source,
@@ -100,7 +112,7 @@ class FormatterPipelineTests(unittest.TestCase):
         self.assertEqual(icons.standard.size, (420, 420))
 
     def test_rejects_rings_that_consume_the_entire_circle(self):
-        source = Image.new("RGB", (10, 10), GRAY)
+        source = Image.new("RGB", (10, 10), BLACK)
 
         with self.assertRaisesRegex(ValueError, "leave no room"):
             format_icon(

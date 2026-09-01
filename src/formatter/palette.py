@@ -8,7 +8,12 @@ from collections.abc import Iterable
 
 from PIL import Image
 
-from src.config.icon import GRAY, TRANSPARENT, WHITE
+from src.config.icon import (
+    BLACK,
+    INTERNAL_ARTWORK_COLOR,
+    TRANSPARENT,
+    WHITE,
+)
 from src.formatter.models import PaletteReport
 
 
@@ -30,7 +35,7 @@ def parse_theme_hex(value: str) -> tuple[int, int, int]:
 
     digits = match.group(1)
     theme = tuple(int(digits[index : index + 2], 16) for index in (0, 2, 4))
-    if theme in {WHITE, GRAY}:
+    if theme in {WHITE, INTERNAL_ARTWORK_COLOR}:
         raise ValueError("The theme color must differ from white and #808080.")
     return theme
 
@@ -68,16 +73,10 @@ def _flatten_against_white(pixel: tuple[int, int, int, int]) -> tuple[int, int, 
 def normalize_uploaded_artwork(
     image: Image.Image,
 ) -> tuple[Image.Image, PaletteReport]:
-    """Crop transparent margins, fill alpha with white, and enforce two colors."""
+    """Classify visible pixels as black or white using an internal marker."""
     rgba = image.convert("RGBA")
-    alpha_bounds = rgba.getchannel("A").getbbox()
-    if alpha_bounds is None:
+    if rgba.getchannel("A").getbbox() is None:
         raise ValueError("The uploaded image is fully transparent.")
-
-    full_bounds = (0, 0, rgba.width, rgba.height)
-    cropped_margin = alpha_bounds != full_bounds
-    if cropped_margin:
-        rgba = rgba.crop(alpha_bounds)
 
     source_pixels = list(flattened_data(rgba))
     unique_pixels = Counter(source_pixels)
@@ -89,12 +88,15 @@ def normalize_uploaded_artwork(
     for pixel, count in unique_pixels.items():
         flattened = _flatten_against_white(pixel)
         source_colors.add(flattened)
-        replacement_rgb = nearest_color(flattened, (WHITE, GRAY))
+        visible_rgb = nearest_color(flattened, (WHITE, BLACK))
+        replacement_rgb = (
+            INTERNAL_ARTWORK_COLOR if visible_rgb == BLACK else WHITE
+        )
         replacements[pixel] = (*replacement_rgb, 255)
 
         if pixel[3] < 255:
             transparent_pixels += count
-        if flattened != replacement_rgb:
+        if flattened != visible_rgb:
             corrected_pixels += count
 
     normalized = Image.new("RGBA", rgba.size)
@@ -103,7 +105,6 @@ def normalize_uploaded_artwork(
         source_color_count=len(source_colors),
         corrected_pixel_count=corrected_pixels,
         transparent_pixel_count=transparent_pixels,
-        cropped_transparent_margin=cropped_margin,
     )
     return normalized, report
 

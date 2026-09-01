@@ -22,9 +22,10 @@ from src.st_utils.downloads import png_bytes
 
 
 RESULT_KEY = "rendered_icon_result"
-PROMPT_SPECIFICATION = (
+PROMPT_TEMPLATE = (
+    "Let's make an icon for: \n\n"
     "Specifications: Create the icon artwork at 900 × 900 px using only "
-    "#FFFFFF and #808080. Do not add an outer circle. Keep the design bold, "
+    "#FFFFFF and #000000. Do not add an outer circle. Keep the design bold, "
     "centered, and recognizable when reduced to 450 × 450 px."
 )
 
@@ -41,7 +42,7 @@ def _show_palette_report(report: PaletteReport) -> None:
     details = [f"Detected {report.source_color_count:,} source RGB color(s)."]
     if report.corrected_pixel_count:
         details.append(
-            f"Mapped {report.corrected_pixel_count:,} pixel(s) to white or #808080."
+            f"Mapped {report.corrected_pixel_count:,} pixel(s) to black or white."
         )
     else:
         details.append("The visible artwork already used the standard palette.")
@@ -50,19 +51,17 @@ def _show_palette_report(report: PaletteReport) -> None:
             f"Filled {report.transparent_pixel_count:,} transparent or "
             "partially transparent pixel(s) with white."
         )
-    if report.cropped_transparent_margin:
-        details.append("Cropped transparent exterior margins before resizing.")
     st.markdown(
         f'<div class="palette-report">{" ".join(details)}</div>',
         unsafe_allow_html=True,
     )
 
 
-def _show_prompt_tip() -> None:
+def _show_prompt_guide() -> None:
     st.divider()
-    st.markdown("#### Quick prompt tip")
-    st.caption("Add this specification line when asking an LLM to create an icon:")
-    st.code(PROMPT_SPECIFICATION, language=None, wrap_lines=True)
+    st.markdown("#### Icon prompt guide")
+    st.caption("Fill in the icon details after the colon, then copy the prompt:")
+    st.code(PROMPT_TEMPLATE, language=None, wrap_lines=True)
 
 
 def render_icon_formatter() -> None:
@@ -119,7 +118,7 @@ def render_icon_formatter() -> None:
     )
     st.title("Icon Formatter")
     st.write(
-        "Upload white and #808080 artwork, then provide the theme color for "
+        "Upload white and #000000 artwork, then provide the theme color for "
         "the generated icon set."
     )
 
@@ -145,9 +144,9 @@ def render_icon_formatter() -> None:
         with theme_column:
             theme_value = st.text_input(
                 "Theme color",
-                value="#0070C0",
+                value="#000000",
                 max_chars=7,
-                help="Enter a six-digit RGB hex color.",
+                help="Enter a six-digit RGB hex color. Black is supported.",
             )
 
         with size_column:
@@ -231,19 +230,20 @@ def render_icon_formatter() -> None:
     result = st.session_state.get(RESULT_KEY)
     if result is None:
         st.caption("Choose the settings, then render all four icon variants.")
-        _show_prompt_tip()
+        _show_prompt_guide()
         return
 
     icon_set = result["icon_set"]
     output_size = result["artwork_size"] + (2 * result["padding"])
     columns = st.columns(4, gap="large")
+    theme_hex = format_hex(result["theme"])[1:]
     for column, (name, image) in zip(columns, icon_set.variants().items()):
         with column:
             st.image(image, width=250)
             st.download_button(
                 "Download",
                 data=result["encoded_variants"][name],
-                file_name=f"{result['original_name']}-{name}.png",
+                file_name=f"{result['original_name']}-{name}-{theme_hex}.png",
                 mime="image/png",
                 key=f"download-{name}",
                 on_click="ignore",
@@ -260,4 +260,4 @@ def render_icon_formatter() -> None:
         f"{result['white_ring_width']}px white"
     )
 
-    _show_prompt_tip()
+    _show_prompt_guide()

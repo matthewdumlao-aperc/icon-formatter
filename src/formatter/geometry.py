@@ -6,7 +6,7 @@ from PIL import Image, ImageChops, ImageDraw
 
 from src.config.icon import (
     ANTIALIAS_SCALE,
-    GRAY,
+    INTERNAL_ARTWORK_COLOR,
     TRANSPARENT,
     WHITE,
 )
@@ -29,7 +29,7 @@ def fit_artwork(image: Image.Image, artwork_size: int) -> Image.Image:
         max(1, round(image.height * scale)),
     )
     fitted = resize_rgba(image, fitted_size)
-    fitted = snap_rgb_to_palette(fitted, (WHITE, GRAY))
+    fitted = snap_rgb_to_palette(fitted, (WHITE, INTERNAL_ARTWORK_COLOR))
 
     content = Image.new("RGBA", (artwork_size, artwork_size), (*WHITE, 255))
     offset = (
@@ -56,9 +56,9 @@ def _circle_layer(
         fill=(*WHITE, 255),
     )
     resized = resize_rgba(large, (canvas_size, canvas_size))
-    # The circle does not contain artwork gray. Snapping its antialiased inner
-    # edge against all three standard colors can create a gray seam that later
-    # becomes white in the solid variant.
+    # The circle does not contain the internal artwork marker. Snapping its
+    # antialiased inner edge against all three standard colors can create a
+    # marker seam that later becomes white in the solid variant.
     return snap_rgb_to_palette(resized, (theme, WHITE))
 
 
@@ -113,7 +113,7 @@ def build_standard_icon(
         white_ring_width,
     )
     standard.paste(content, (padding, padding), mask)
-    return snap_rgb_to_palette(standard, (theme, WHITE, GRAY))
+    return snap_rgb_to_palette(standard, (theme, WHITE, INTERNAL_ARTWORK_COLOR))
 
 
 def build_uncircled_artwork(

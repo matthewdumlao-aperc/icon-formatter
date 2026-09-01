@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from PIL import Image
 
-from src.config.icon import GRAY, TRANSPARENT, WHITE
+from src.config.icon import BLACK, INTERNAL_ARTWORK_COLOR, TRANSPARENT, WHITE
 from src.formatter.palette import flattened_data
 
 
@@ -15,9 +15,9 @@ def map_variant(
 ) -> Image.Image:
     """Map an exact three-color standard icon to a two-color variant."""
     if variant_type == "solid":
-        mapping = {theme: theme, WHITE: theme, GRAY: WHITE}
+        mapping = {theme: theme, WHITE: theme, INTERNAL_ARTWORK_COLOR: WHITE}
     elif variant_type == "dominant":
-        mapping = {theme: theme, WHITE: WHITE, GRAY: theme}
+        mapping = {theme: theme, WHITE: WHITE, INTERNAL_ARTWORK_COLOR: theme}
     else:
         raise ValueError(f"Unknown variant type: {variant_type}")
 
@@ -38,18 +38,34 @@ def map_variant(
     return result
 
 
+def reveal_black_artwork(image: Image.Image) -> Image.Image:
+    """Convert the internal artwork marker to black for public output."""
+    source_pixels = list(flattened_data(image.convert("RGBA")))
+    replacements: dict[tuple[int, int, int, int], tuple[int, int, int, int]] = {}
+    for pixel in set(source_pixels):
+        red, green, blue, alpha = pixel
+        if alpha != 0 and (red, green, blue) == INTERNAL_ARTWORK_COLOR:
+            replacements[pixel] = (*BLACK, alpha)
+        else:
+            replacements[pixel] = pixel
+
+    result = Image.new("RGBA", image.size)
+    result.putdata([replacements[pixel] for pixel in source_pixels])
+    return result
+
+
 def map_uncircled_dominant(
     artwork: Image.Image,
     theme: tuple[int, int, int],
 ) -> Image.Image:
-    """Map gray artwork to the theme color and remove its white background."""
+    """Map internally marked artwork to the theme and remove white."""
     source_pixels = list(flattened_data(artwork.convert("RGBA")))
     replacements: dict[tuple[int, int, int, int], tuple[int, int, int, int]] = {}
     for pixel in set(source_pixels):
         red, green, blue, alpha = pixel
         if alpha == 0 or (red, green, blue) == WHITE:
             replacements[pixel] = TRANSPARENT
-        elif (red, green, blue) == GRAY:
+        elif (red, green, blue) == INTERNAL_ARTWORK_COLOR:
             replacements[pixel] = (*theme, alpha)
         else:
             raise ValueError(

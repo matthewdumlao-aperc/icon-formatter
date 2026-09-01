@@ -11,7 +11,11 @@ from src.config.icon import (
 from src.formatter.geometry import build_standard_icon, build_uncircled_artwork
 from src.formatter.models import IconSet
 from src.formatter.palette import normalize_uploaded_artwork
-from src.formatter.variants import map_uncircled_dominant, map_variant
+from src.formatter.variants import (
+    map_uncircled_dominant,
+    map_variant,
+    reveal_black_artwork,
+)
 
 
 def format_icon(
@@ -37,7 +41,7 @@ def format_icon(
         raise ValueError("The ring widths leave no room for the artwork.")
 
     normalized, report = normalize_uploaded_artwork(image)
-    standard = build_standard_icon(
+    internal_standard = build_standard_icon(
         normalized,
         theme,
         artwork_size,
@@ -47,10 +51,10 @@ def format_icon(
     )
     uncircled_artwork = build_uncircled_artwork(normalized, artwork_size, padding)
     return IconSet(
-        normalized_artwork=normalized,
-        standard=standard,
-        solid=map_variant(standard, theme, "solid"),
-        dominant=map_variant(standard, theme, "dominant"),
+        normalized_artwork=reveal_black_artwork(normalized),
+        standard=reveal_black_artwork(internal_standard),
+        solid=map_variant(internal_standard, theme, "solid"),
+        dominant=map_variant(internal_standard, theme, "dominant"),
         dominant_no_circle=map_uncircled_dominant(uncircled_artwork, theme),
         palette_report=report,
     )

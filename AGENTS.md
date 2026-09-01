@@ -19,9 +19,10 @@ variants.
 ## Image invariants
 
 - Accept PNG, JPG, and JPEG uploads.
-- Treat transparent pixels as white after cropping transparent exterior margins.
-- Normalize uploaded artwork to exactly white and `#808080` by nearest-color
-  mapping before building variants.
+- Treat transparent pixels as white without cropping exterior margins.
+- Classify uploaded artwork as exactly white and `#000000` by nearest-color
+  mapping. Use `#808080` only as an internal marker while building variants so
+  black remains available as a theme color.
 - Take the theme color from user-supplied hex input; never infer it from pixels.
 - Preserve the artwork aspect ratio.
 - Produce square RGBA PNG outputs sized as artwork plus twice the padding.
