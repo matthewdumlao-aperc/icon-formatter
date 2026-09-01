@@ -1,0 +1,1 @@
+"""Icon Formatter test suite."""

@@ -1,0 +1,13 @@
+"""Image-formatting constants shared by the formatter modules."""
+
+DEFAULT_ARTWORK_SIZE = 900
+DEFAULT_PADDING = 50
+DEFAULT_THEME_RING_WIDTH = 30
+DEFAULT_WHITE_RING_WIDTH = 20
+ANTIALIAS_SCALE = 4
+
+WHITE = (255, 255, 255)
+GRAY = (128, 128, 128)
+TRANSPARENT = (0, 0, 0, 0)
+
+ACCEPTED_IMAGE_FORMATS = frozenset({"PNG", "JPEG"})

@@ -1,0 +1,1 @@
+"""Icon Formatter application package."""
