@@ -8,10 +8,10 @@ from src.config.icon import (
     DEFAULT_THEME_RING_WIDTH,
     DEFAULT_WHITE_RING_WIDTH,
 )
-from src.formatter.geometry import build_standard_icon
+from src.formatter.geometry import build_standard_icon, build_uncircled_artwork
 from src.formatter.models import IconSet
 from src.formatter.palette import normalize_uploaded_artwork
-from src.formatter.variants import map_variant
+from src.formatter.variants import map_uncircled_dominant, map_variant
 
 
 def format_icon(
@@ -22,7 +22,7 @@ def format_icon(
     theme_ring_width: int = DEFAULT_THEME_RING_WIDTH,
     white_ring_width: int = DEFAULT_WHITE_RING_WIDTH,
 ) -> IconSet:
-    """Normalize one upload and return all three configured icon variants."""
+    """Normalize one upload and return all four configured icon variants."""
     if artwork_size <= 0:
         raise ValueError("Artwork size must be greater than zero.")
     if padding < 0:
@@ -45,10 +45,12 @@ def format_icon(
         theme_ring_width,
         white_ring_width,
     )
+    uncircled_artwork = build_uncircled_artwork(normalized, artwork_size, padding)
     return IconSet(
         normalized_artwork=normalized,
         standard=standard,
         solid=map_variant(standard, theme, "solid"),
         dominant=map_variant(standard, theme, "dominant"),
+        dominant_no_circle=map_uncircled_dominant(uncircled_artwork, theme),
         palette_report=report,
     )

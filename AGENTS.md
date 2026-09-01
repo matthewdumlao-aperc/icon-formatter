@@ -3,7 +3,8 @@
 ## Project purpose
 
 This repository contains a Streamlit app that converts uploaded two-color icon
-artwork into the APERC standard, solid, and dominant icon variants.
+artwork into the APERC standard, solid, dominant, and circle-free dominant icon
+variants.
 
 ## Source layout
 
@@ -29,14 +30,15 @@ artwork into the APERC standard, solid, and dominant icon variants.
 - Keep artwork size, padding, theme-ring width, and white-ring width
   independently configurable.
 - Do not process uploads until the user explicitly selects the render button.
-- Show the standard, solid, and dominant outputs together after rendering.
+- Show the standard, solid, dominant, and circle-free dominant outputs together
+  after rendering.
 
 ## Interface invariants
 
 - Keep the desktop application container fixed at 1380 px.
 - Accept only one uploaded file and preserve its remove control after selection.
 - Keep the upload, theme, and four geometry inputs in six equal columns.
-- Center all three outputs side by side at a 350 px preview width.
+- Center all four outputs side by side at a 250 px preview width.
 - Keep processing metadata below the output row.
 - Keep visible variant names out of the interface; distinguish downloaded files
   through their filename suffixes.

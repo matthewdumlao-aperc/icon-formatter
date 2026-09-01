@@ -114,3 +114,15 @@ def build_standard_icon(
     )
     standard.paste(content, (padding, padding), mask)
     return snap_rgb_to_palette(standard, (theme, WHITE, GRAY))
+
+
+def build_uncircled_artwork(
+    artwork: Image.Image,
+    artwork_size: int,
+    padding: int,
+) -> Image.Image:
+    """Fit normalized artwork on a transparent canvas without circular clipping."""
+    canvas_size = artwork_size + (2 * padding)
+    canvas = Image.new("RGBA", (canvas_size, canvas_size), TRANSPARENT)
+    canvas.alpha_composite(fit_artwork(artwork, artwork_size), (padding, padding))
+    return canvas

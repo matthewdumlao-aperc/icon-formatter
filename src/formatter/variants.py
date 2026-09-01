@@ -36,3 +36,26 @@ def map_variant(
     result = Image.new("RGBA", standard.size)
     result.putdata([replacements[pixel] for pixel in source_pixels])
     return result
+
+
+def map_uncircled_dominant(
+    artwork: Image.Image,
+    theme: tuple[int, int, int],
+) -> Image.Image:
+    """Map gray artwork to the theme color and remove its white background."""
+    source_pixels = list(flattened_data(artwork.convert("RGBA")))
+    replacements: dict[tuple[int, int, int, int], tuple[int, int, int, int]] = {}
+    for pixel in set(source_pixels):
+        red, green, blue, alpha = pixel
+        if alpha == 0 or (red, green, blue) == WHITE:
+            replacements[pixel] = TRANSPARENT
+        elif (red, green, blue) == GRAY:
+            replacements[pixel] = (*theme, alpha)
+        else:
+            raise ValueError(
+                f"Unexpected normalized-artwork color: {(red, green, blue)}"
+            )
+
+    result = Image.new("RGBA", artwork.size)
+    result.putdata([replacements[pixel] for pixel in source_pixels])
+    return result

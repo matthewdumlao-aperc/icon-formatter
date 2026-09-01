@@ -14,7 +14,7 @@ from src.formatter.palette import flattened_data
 
 
 class FormatterPipelineTests(unittest.TestCase):
-    def test_builds_three_default_size_palette_safe_variants(self):
+    def test_builds_four_default_size_palette_safe_variants(self):
         source = Image.new("RGB", (200, 100), WHITE)
         for y in range(20, 80):
             for x in range(40, 160):

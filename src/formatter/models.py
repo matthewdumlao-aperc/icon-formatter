@@ -17,12 +17,13 @@ class PaletteReport:
 
 @dataclass(frozen=True)
 class IconSet:
-    """The normalized upload and its three generated variants."""
+    """The normalized upload and its four generated variants."""
 
     normalized_artwork: Image.Image
     standard: Image.Image
     solid: Image.Image
     dominant: Image.Image
+    dominant_no_circle: Image.Image
     palette_report: PaletteReport
 
     def variants(self) -> dict[str, Image.Image]:
@@ -30,4 +31,5 @@ class IconSet:
             "standard": self.standard,
             "solid": self.solid,
             "dominant": self.dominant,
+            "dominant-no-circle": self.dominant_no_circle,
         }

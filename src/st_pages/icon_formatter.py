@@ -201,7 +201,7 @@ def render_icon_formatter() -> None:
             try:
                 theme = parse_theme_hex(theme_value)
                 source = _open_upload(uploaded.getvalue())
-                with st.spinner("Rendering all three variants…"):
+                with st.spinner("Rendering all four variants…"):
                     icon_set = format_icon(
                         source,
                         theme,
@@ -230,16 +230,16 @@ def render_icon_formatter() -> None:
 
     result = st.session_state.get(RESULT_KEY)
     if result is None:
-        st.caption("Choose the settings, then render all three icon variants.")
+        st.caption("Choose the settings, then render all four icon variants.")
         _show_prompt_tip()
         return
 
     icon_set = result["icon_set"]
     output_size = result["artwork_size"] + (2 * result["padding"])
-    columns = st.columns(3, gap="large")
+    columns = st.columns(4, gap="large")
     for column, (name, image) in zip(columns, icon_set.variants().items()):
         with column:
-            st.image(image, width=350)
+            st.image(image, width=250)
             st.download_button(
                 "Download",
                 data=result["encoded_variants"][name],

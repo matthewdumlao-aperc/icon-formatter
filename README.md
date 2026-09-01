@@ -1,6 +1,6 @@
 # Icon Formatter
 
-A Streamlit app for turning white and `#808080` artwork into three consistent
+A Streamlit app for turning white and `#808080` artwork into four consistent
 PNG icon variants using a user-provided theme color and geometry.
 
 ## Inputs
@@ -20,12 +20,14 @@ transparent pixels are treated as white. JPG images use their full canvas.
   white/gray artwork
 - **Solid:** white is mapped to the theme color and gray is mapped to white
 - **Dominant:** white remains white and gray is mapped to the theme color
+- **Dominant without circle:** gray is mapped to the theme color while white
+  becomes transparent; no rings or circular clipping are applied
 
 The artwork is centered without changing its aspect ratio. Output width and
 height equal the artwork size plus twice the per-side padding. Defaults are a
 900 px artwork area, 50 px padding, 30 px theme ring, and 20 px white ring.
 
-Rendering only starts when **Render icons** is selected. All three generated
+Rendering only starts when **Render icons** is selected. All four generated
 variants are then shown together with individual download buttons.
 
 ## Interface
@@ -33,7 +35,7 @@ variants are then shown together with individual download buttons.
 - Accept one uploaded file and retain its remove control after selection.
 - Present the upload, theme, and four geometry settings in six equal columns.
 - Use a fixed 1380 px application container for the desktop layout.
-- Show all three generated variants side by side as centered 350 px previews.
+- Show all four generated variants side by side as centered 250 px previews.
 - Place palette-correction and render-setting details below the previews.
 - Provide a reusable specification line for prompting an LLM to create suitable
   source artwork.
