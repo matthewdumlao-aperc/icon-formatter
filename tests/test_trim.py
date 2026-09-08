@@ -4,6 +4,7 @@ from PIL import Image
 
 from src.config.icon import BLACK, TRANSPARENT, WHITE
 from src.formatter import trim_image
+from src.formatter.palette import flattened_data
 
 
 class TrimImageTests(unittest.TestCase):
@@ -17,7 +18,7 @@ class TrimImageTests(unittest.TestCase):
 
         self.assertEqual(trimmed.mode, "RGBA")
         self.assertEqual(trimmed.size, (5, 4))
-        self.assertEqual(set(trimmed.getdata()), {(*BLACK, 255)})
+        self.assertEqual(set(flattened_data(trimmed)), {(*BLACK, 255)})
 
     def test_crops_transparency_and_preserves_pixels_inside_bounds(self):
         source = Image.new("RGBA", (7, 6), TRANSPARENT)
