@@ -3,6 +3,7 @@
 import streamlit as st
 
 from src.st_pages.icon_formatter import render_icon_formatter
+from src.st_pages.trim import render_trim
 
 
 st.set_page_config(
@@ -11,4 +12,20 @@ st.set_page_config(
     layout="wide",
 )
 
-render_icon_formatter()
+page = st.navigation(
+    [
+        st.Page(
+            render_icon_formatter,
+            title="Icon Formatter",
+            default=True,
+        ),
+        st.Page(
+            render_trim,
+            title="Trim Icon",
+            url_path="trim",
+            visibility="hidden",
+        ),
+    ],
+    position="hidden",
+)
+page.run()
