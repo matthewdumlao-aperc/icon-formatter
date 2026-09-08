@@ -27,7 +27,11 @@ class FormatterPipelineTests(unittest.TestCase):
         for image in icons.variants().values():
             self.assertEqual(image.size, (output_size, output_size))
             self.assertEqual(image.mode, "RGBA")
+        for image in (icons.standard, icons.solid, icons.dominant):
             self.assertEqual(image.getpixel((0, 0)), TRANSPARENT)
+        self.assertEqual(
+            icons.dominant_no_circle.getpixel((0, 0)), (*WHITE, 255)
+        )
 
         standard_colors = {
             pixel[:3]
@@ -47,6 +51,17 @@ class FormatterPipelineTests(unittest.TestCase):
         self.assertLessEqual(standard_colors, {theme, WHITE, BLACK})
         self.assertLessEqual(solid_colors, {theme, WHITE})
         self.assertLessEqual(dominant_colors, {theme, WHITE})
+
+    def test_circle_free_background_can_be_transparent(self):
+        source = Image.new("RGB", (10, 10), BLACK)
+
+        icons = format_icon(
+            source,
+            (0, 112, 192),
+            transparent_background=True,
+        )
+
+        self.assertEqual(icons.dominant_no_circle.getpixel((0, 0)), TRANSPARENT)
 
     def test_variant_center_pixel_mappings(self):
         source = Image.new("RGB", (10, 10), BLACK)

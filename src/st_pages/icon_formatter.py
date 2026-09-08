@@ -118,7 +118,8 @@ def render_icon_formatter() -> None:
     )
     st.title("Icon Formatter")
     st.write(
-        "Upload white and #000000 artwork, then provide the theme color for "
+        "Upload white artwork with black or gray foreground, then provide the "
+        "theme color for "
         "the generated icon set."
     )
 
@@ -186,6 +187,14 @@ def render_icon_formatter() -> None:
                 help="Larger values clip the artwork farther inside the theme ring.",
             )
 
+        transparent_background = st.checkbox(
+            "Transparent circle-free background",
+            value=False,
+            help=(
+                "Replace the white background with transparency in the "
+                "circle-free dominant download."
+            ),
+        )
         render_clicked = st.form_submit_button(
             "Render icons",
             type="primary",
@@ -208,6 +217,7 @@ def render_icon_formatter() -> None:
                         padding=int(padding),
                         theme_ring_width=int(theme_ring_width),
                         white_ring_width=int(white_ring_width),
+                        transparent_background=transparent_background,
                     )
                     encoded_variants = {
                         name: png_bytes(image)
@@ -225,6 +235,7 @@ def render_icon_formatter() -> None:
                     "padding": int(padding),
                     "theme_ring_width": int(theme_ring_width),
                     "white_ring_width": int(white_ring_width),
+                    "transparent_background": transparent_background,
                 }
 
     result = st.session_state.get(RESULT_KEY)
@@ -257,7 +268,9 @@ def render_icon_formatter() -> None:
         f"Artwork: {result['artwork_size']}px · "
         f"Padding: {result['padding']}px per side · "
         f"Rings: {result['theme_ring_width']}px theme + "
-        f"{result['white_ring_width']}px white"
+        f"{result['white_ring_width']}px white · "
+        "Circle-free background: "
+        f"{'transparent' if result['transparent_background'] else 'white'}"
     )
 
     _show_prompt_guide()

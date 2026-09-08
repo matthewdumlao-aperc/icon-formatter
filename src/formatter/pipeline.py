@@ -25,6 +25,7 @@ def format_icon(
     padding: int = DEFAULT_PADDING,
     theme_ring_width: int = DEFAULT_THEME_RING_WIDTH,
     white_ring_width: int = DEFAULT_WHITE_RING_WIDTH,
+    transparent_background: bool = False,
 ) -> IconSet:
     """Normalize one upload and return all four configured icon variants."""
     if artwork_size <= 0:
@@ -55,6 +56,10 @@ def format_icon(
         standard=reveal_black_artwork(internal_standard),
         solid=map_variant(internal_standard, theme, "solid"),
         dominant=map_variant(internal_standard, theme, "dominant"),
-        dominant_no_circle=map_uncircled_dominant(uncircled_artwork, theme),
+        dominant_no_circle=map_uncircled_dominant(
+            uncircled_artwork,
+            theme,
+            transparent_background=transparent_background,
+        ),
         palette_report=report,
     )
