@@ -20,8 +20,9 @@ variants.
 
 - Accept PNG, JPG, and JPEG uploads.
 - Treat transparent pixels as white without cropping exterior margins.
-- Classify uploaded artwork as exactly white and `#000000` by nearest-color
-  mapping. Use `#808080` only as an internal marker while building variants so
+- Classify uploaded artwork as exactly white and `#000000` with a luminance
+  threshold; by default, treat `#808080` and darker pixels as foreground.
+  Use `#808080` only as an internal marker while building variants so
   black remains available as a theme color.
 - Take the theme color from user-supplied hex input; never infer it from pixels.
 - Preserve the artwork aspect ratio.
@@ -43,6 +44,8 @@ variants.
 - Keep processing metadata below the output row.
 - Keep visible variant names out of the interface; distinguish downloaded files
   through their filename suffixes.
+- Let users choose whether the circle-free dominant output has a white or
+  transparent background; default to white.
 
 ## Development
 
