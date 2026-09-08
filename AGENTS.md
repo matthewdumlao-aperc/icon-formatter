@@ -46,6 +46,10 @@ variants.
 
 ## Development
 
+- Do not run or automate tests for Streamlit UI changes unless explicitly
+  requested; the user will visually inspect them.
+- Always commit application changes separately from harness or developer-
+  guidance changes, including changes to this `AGENTS.md` file.
 - Use `/home/dev/Desktop/venv-streamlit/bin/python` for local commands.
 - Declare deployment dependencies in `requirements.txt`.
 - Run tests with:
