@@ -10,6 +10,7 @@ from PIL import Image
 
 from src.config.icon import (
     BLACK,
+    DEFAULT_FOREGROUND_THRESHOLD,
     INTERNAL_ARTWORK_COLOR,
     TRANSPARENT,
     WHITE,
@@ -51,6 +52,12 @@ def color_distance_squared(
     return sum((left - right) ** 2 for left, right in zip(first, second))
 
 
+def perceived_luminance(color: tuple[int, int, int]) -> int:
+    """Return an integer approximation of an RGB color's perceived brightness."""
+    red, green, blue = color
+    return round((299 * red + 587 * green + 114 * blue) / 1000)
+
+
 def nearest_color(
     color: tuple[int, int, int],
     palette: tuple[tuple[int, int, int], ...],
@@ -72,8 +79,12 @@ def _flatten_against_white(pixel: tuple[int, int, int, int]) -> tuple[int, int, 
 
 def normalize_uploaded_artwork(
     image: Image.Image,
+    foreground_threshold: int = DEFAULT_FOREGROUND_THRESHOLD,
 ) -> tuple[Image.Image, PaletteReport]:
-    """Classify visible pixels as black or white using an internal marker."""
+    """Classify pixels by luminance as foreground or white background."""
+    if not 0 <= foreground_threshold <= 255:
+        raise ValueError("Foreground threshold must be between 0 and 255.")
+
     rgba = image.convert("RGBA")
     if rgba.getchannel("A").getbbox() is None:
         raise ValueError("The uploaded image is fully transparent.")
@@ -88,7 +99,11 @@ def normalize_uploaded_artwork(
     for pixel, count in unique_pixels.items():
         flattened = _flatten_against_white(pixel)
         source_colors.add(flattened)
-        visible_rgb = nearest_color(flattened, (WHITE, BLACK))
+        visible_rgb = (
+            BLACK
+            if perceived_luminance(flattened) < foreground_threshold
+            else WHITE
+        )
         replacement_rgb = (
             INTERNAL_ARTWORK_COLOR if visible_rgb == BLACK else WHITE
         )

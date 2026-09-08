@@ -57,14 +57,17 @@ def reveal_black_artwork(image: Image.Image) -> Image.Image:
 def map_uncircled_dominant(
     artwork: Image.Image,
     theme: tuple[int, int, int],
+    *,
+    transparent_background: bool = True,
 ) -> Image.Image:
-    """Map internally marked artwork to the theme and remove white."""
+    """Map marked artwork to the theme and choose its background treatment."""
     source_pixels = list(flattened_data(artwork.convert("RGBA")))
     replacements: dict[tuple[int, int, int, int], tuple[int, int, int, int]] = {}
+    background = TRANSPARENT if transparent_background else (*WHITE, 255)
     for pixel in set(source_pixels):
         red, green, blue, alpha = pixel
         if alpha == 0 or (red, green, blue) == WHITE:
-            replacements[pixel] = TRANSPARENT
+            replacements[pixel] = background
         elif (red, green, blue) == INTERNAL_ARTWORK_COLOR:
             replacements[pixel] = (*theme, alpha)
         else:

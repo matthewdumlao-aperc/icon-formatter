@@ -26,13 +26,16 @@ class PaletteNormalizationTests(unittest.TestCase):
     def test_preserves_canvas_fills_transparency_and_snaps_colors(self):
         image = Image.new("RGBA", (4, 4), (0, 0, 0, 0))
         image.putpixel((1, 1), (250, 250, 250, 255))
-        image.putpixel((2, 1), (120, 120, 120, 255))
+        image.putpixel((2, 1), (128, 128, 128, 255))
         image.putpixel((1, 2), (0, 0, 0, 0))
         image.putpixel((2, 2), (200, 200, 200, 128))
 
         normalized, report = normalize_uploaded_artwork(image)
 
         self.assertEqual(normalized.size, (4, 4))
+        self.assertEqual(
+            normalized.getpixel((2, 1)), (*INTERNAL_ARTWORK_COLOR, 255)
+        )
         self.assertGreater(report.corrected_pixel_count, 0)
         self.assertGreater(report.transparent_pixel_count, 0)
         visible = {pixel[:3] for pixel in flattened_data(normalized)}
