@@ -15,7 +15,7 @@ from src.config.icon import (
     DEFAULT_THEME_RING_WIDTH,
     DEFAULT_WHITE_RING_WIDTH,
 )
-from src.formatter import format_icon
+from src.formatter import format_icon, formatted_icon_filename
 from src.formatter.models import PaletteReport
 from src.formatter.palette import format_hex, parse_theme_hex
 from src.st_utils.downloads import png_bytes
@@ -254,7 +254,9 @@ def render_icon_formatter() -> None:
             st.download_button(
                 "Download",
                 data=result["encoded_variants"][name],
-                file_name=f"{result['original_name']}-{name}-{theme_hex}.png",
+                file_name=formatted_icon_filename(
+                    result["original_name"], name, theme_hex
+                ),
                 mime="image/png",
                 key=f"download-{name}",
                 on_click="ignore",

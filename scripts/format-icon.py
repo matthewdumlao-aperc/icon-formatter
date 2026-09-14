@@ -12,7 +12,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.formatter import format_icon, trim_image
+from src.formatter import format_icon, formatted_icon_filename, trim_image
 from src.formatter.palette import format_hex, parse_theme_hex
 from src.st_utils.downloads import png_bytes
 from src.st_utils.uploads import open_image_upload
@@ -37,14 +37,18 @@ def format_icon_file(
     output_paths: list[Path] = []
     for variant_name, image in icon_set.variants().items():
         output_path = icon_path.with_name(
-            f"{icon_path.stem}-{variant_name}-{theme_hex}.png"
+            formatted_icon_filename(icon_path.stem, variant_name, theme_hex)
         )
         output_path.write_bytes(png_bytes(image))
         output_paths.append(output_path)
 
     trimmed_variant = trim_image(icon_set.dominant_no_circle)
     trimmed_path = icon_path.with_name(
-        f"{icon_path.stem}-dominant-no-circle-trimmed-{theme_hex}.png"
+        formatted_icon_filename(
+            icon_path.stem,
+            "dominant-no-circle-trimmed",
+            theme_hex,
+        )
     )
     trimmed_path.write_bytes(png_bytes(trimmed_variant))
     output_paths.append(trimmed_path)
